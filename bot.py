@@ -28,6 +28,7 @@ CATEGORIAS = ["eletrônicos", "games", "informática", "notebook",
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 VISTAS_FILE = "ofertas_vistas.json"
+CUPONS_VISTOS_FILE = "cupons_vistos.json"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     "Accept-Language": "pt-BR,pt;q=0.9",
@@ -47,6 +48,18 @@ def salvar_vistas(vistas: set):
         json.dump(list(vistas), f)
 
 
+def carregar_cupons_vistos() -> set:
+    if os.path.exists(CUPONS_VISTOS_FILE):
+        with open(CUPONS_VISTOS_FILE) as f:
+            return set(json.load(f))
+    return set()
+
+
+def salvar_cupons_vistos(vistos: set):
+    with open(CUPONS_VISTOS_FILE, "w") as f:
+        json.dump(list(vistos), f)
+
+
 @dataclass
 class Oferta:
     titulo: str
@@ -59,10 +72,24 @@ class Oferta:
         return hashlib.md5(self.link.encode()).hexdigest()
 
 
+@dataclass
+class Cupom:
+    loja: str
+    codigo: str
+    descricao: str
+    link: str
+    fonte: str
+
+    def id(self) -> str:
+        return hashlib.md5((self.loja + self.codigo).encode()).hexdigest()
+
+
 def eh_relevante(titulo: str) -> bool:
     t = titulo.lower()
     return any(cat in t for cat in CATEGORIAS)
 
+
+# ─── OFERTAS ──────────────────────────────────────────────────────────────────
 
 async def buscar_pelando(client):
     ofertas = []
@@ -120,7 +147,6 @@ async def buscar_zoom(client):
                 titulo_el = card.select_one("h2, h3, [class*='title']")
                 preco_el = card.select_one("[class*='price']")
                 link_el = card.select_one("a[href]")
-                img_el = card.select_one("img")
                 if not titulo_el or not link_el: continue
                 titulo = titulo_el.get_text(strip=True)
                 preco = preco_el.get_text(strip=True) if preco_el else "Ver site"
@@ -226,8 +252,8 @@ async def buscar_kabum(client):
         for cat in ["hardware", "games", "celular-smartphone", "notebook-e-netbook"]:
             r = await client.get(f"https://www.kabum.com.br/{cat}?sort=mais_vendidos", headers=HEADERS, timeout=15)
             soup = BeautifulSoup(r.text, "html.parser")
-            for card in soup.select("[class*='productCard'], [class*='card-product'], article")[:10]:
-                titulo_el = card.select_one("span[class*='nameCard'], h2, h3, [class*='title'], [class*='name']")
+            for card in soup.select("[class*='productCard'], article")[:10]:
+                titulo_el = card.select_one("span[class*='nameCard'], h2, h3, [class*='title']")
                 preco_el = card.select_one("[class*='priceCard'], [class*='price']")
                 link_el = card.select_one("a[href]")
                 img_el = card.select_one("img")
@@ -250,19 +276,17 @@ async def buscar_pichau(client):
         for cat in ["placas-de-video", "processadores", "memoria-ram", "notebooks", "monitores"]:
             r = await client.get(f"https://www.pichau.com.br/{cat}?sort=price-desc", headers=HEADERS, timeout=15)
             soup = BeautifulSoup(r.text, "html.parser")
-            for card in soup.select("[class*='MuiCard'], [class*='product'], article")[:10]:
-                titulo_el = card.select_one("h2, h3, [class*='title'], [class*='name']")
-                preco_el = card.select_one("[class*='price'], [class*='valor']")
+            for card in soup.select("[class*='MuiCard'], article")[:10]:
+                titulo_el = card.select_one("h2, h3, [class*='title']")
+                preco_el = card.select_one("[class*='price']")
                 link_el = card.select_one("a[href]")
-                img_el = card.select_one("img")
                 if not titulo_el or not link_el: continue
                 titulo = titulo_el.get_text(strip=True)
                 preco = preco_el.get_text(strip=True) if preco_el else "Ver site"
                 href = link_el["href"]
                 link = href if href.startswith("http") else f"https://www.pichau.com.br{href}"
-                imagem = img_el.get("src") if img_el else None
                 if titulo and len(titulo) > 5:
-                    ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Pichau", imagem=imagem))
+                    ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Pichau"))
     except Exception as e:
         log.warning(f"Pichau erro: {e}")
     return ofertas
@@ -274,25 +298,93 @@ async def buscar_terabyte(client):
         for cat in ["placas-de-video", "processadores", "memoria", "notebook", "monitor"]:
             r = await client.get(f"https://www.terabyteshop.com.br/hardware/{cat}", headers=HEADERS, timeout=15)
             soup = BeautifulSoup(r.text, "html.parser")
-            for card in soup.select("[class*='product'], article, [class*='pbox']")[:10]:
-                titulo_el = card.select_one("h2, h3, [class*='title'], [class*='name'], [class*='prod-name']")
-                preco_el = card.select_one("[class*='price'], [class*='preco'], [class*='prod-new-price']")
+            for card in soup.select("[class*='product'], [class*='pbox']")[:10]:
+                titulo_el = card.select_one("h2, h3, [class*='title'], [class*='prod-name']")
+                preco_el = card.select_one("[class*='price'], [class*='prod-new-price']")
                 link_el = card.select_one("a[href]")
-                img_el = card.select_one("img")
                 if not titulo_el or not link_el: continue
                 titulo = titulo_el.get_text(strip=True)
                 preco = preco_el.get_text(strip=True) if preco_el else "Ver site"
                 href = link_el["href"]
                 link = href if href.startswith("http") else f"https://www.terabyteshop.com.br{href}"
-                imagem = img_el.get("src") if img_el else None
                 if titulo and len(titulo) > 5:
-                    ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Terabyte", imagem=imagem))
+                    ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Terabyte"))
     except Exception as e:
         log.warning(f"Terabyte erro: {e}")
     return ofertas
 
 
-def formatar_mensagem(oferta: Oferta) -> str:
+# ─── CUPONS ───────────────────────────────────────────────────────────────────
+
+async def buscar_cupons_pelando(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.pelando.com.br/cupons", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("article, [class*='coupon'], [class*='Coupon']")[:20]:
+            loja_el = card.select_one("[class*='store'], [class*='Store'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], [class*='Code'], code")
+            desc_el = card.select_one("[class*='desc'], [class*='title'], p")
+            link_el = card.select_one("a[href]")
+            if not loja_el or not link_el: continue
+            loja = loja_el.get_text(strip=True)
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom disponível"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.pelando.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Pelando"))
+    except Exception as e:
+        log.warning(f"Cupons Pelando erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_promobit(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.promobit.com.br/cupons", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='coupon'], [class*='cupom'], article")[:20]:
+            loja_el = card.select_one("[class*='store'], [class*='brand'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], [class*='codigo'], code")
+            desc_el = card.select_one("[class*='desc'], [class*='title'], p")
+            link_el = card.select_one("a[href]")
+            if not loja_el or not link_el: continue
+            loja = loja_el.get_text(strip=True)
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom disponível"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.promobit.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Promobit"))
+    except Exception as e:
+        log.warning(f"Cupons Promobit erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_meliuz(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.meliuz.com.br/cupons", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='coupon'], [class*='offer'], article")[:20]:
+            loja_el = card.select_one("[class*='store'], [class*='brand'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], [class*='codigo']")
+            desc_el = card.select_one("[class*='desc'], [class*='title'], p")
+            link_el = card.select_one("a[href]")
+            if not loja_el or not link_el: continue
+            loja = loja_el.get_text(strip=True)
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom disponível"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.meliuz.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Méliuz"))
+    except Exception as e:
+        log.warning(f"Cupons Méliuz erro: {e}")
+    return cupons
+
+
+# ─── FORMATAR E ENVIAR ────────────────────────────────────────────────────────
+
+def formatar_oferta(oferta: Oferta) -> str:
     emoji = {
         "Pelando": "🔥", "Promobit": "⚡", "Zoom": "🔍",
         "Mercado Livre": "🛒", "Amazon": "📦", "Shopee": "🧡",
@@ -307,8 +399,19 @@ def formatar_mensagem(oferta: Oferta) -> str:
     )
 
 
+def formatar_cupom(cupom: Cupom) -> str:
+    return (
+        f"🎟️ <b>CUPOM — {cupom.loja}</b>\n\n"
+        f"📝 <b>Descrição:</b> {cupom.descricao}\n"
+        f"🔑 <b>Código:</b> <code>{cupom.codigo}</code>\n"
+        f"🏪 <b>Fonte:</b> {cupom.fonte}\n"
+        f"🕐 <b>Encontrado:</b> {datetime.now().strftime('%d/%m %H:%M')}\n\n"
+        f"👉 <a href='{cupom.link}'>Ver cupom</a>"
+    )
+
+
 async def enviar_oferta(bot: Bot, oferta: Oferta):
-    msg = formatar_mensagem(oferta)
+    msg = formatar_oferta(oferta)
     try:
         if oferta.imagem and oferta.imagem.startswith("http"):
             await bot.send_photo(chat_id=TELEGRAM_CHAT_ID, photo=oferta.imagem,
@@ -317,33 +420,37 @@ async def enviar_oferta(bot: Bot, oferta: Oferta):
             await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=msg,
                                    parse_mode=ParseMode.HTML, disable_web_page_preview=False)
     except Exception as e:
-        log.warning(f"Erro ao enviar: {e}")
+        log.warning(f"Erro ao enviar oferta: {e}")
         try:
             await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=msg, parse_mode=ParseMode.HTML)
         except Exception as e2:
             log.error(f"Falha total: {e2}")
 
 
+async def enviar_cupom(bot: Bot, cupom: Cupom):
+    msg = formatar_cupom(cupom)
+    try:
+        await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=msg,
+                               parse_mode=ParseMode.HTML, disable_web_page_preview=False)
+    except Exception as e:
+        log.warning(f"Erro ao enviar cupom: {e}")
+
+
+# ─── LOOP PRINCIPAL ───────────────────────────────────────────────────────────
+
 async def verificar_ofertas(bot: Bot, vistas: set):
     log.info("Verificando ofertas...")
     async with httpx.AsyncClient(follow_redirects=True) as client:
         resultados = await asyncio.gather(
-            buscar_pelando(client),
-            buscar_promobit(client),
-            buscar_zoom(client),
-            buscar_mercadolivre(client),
-            buscar_amazon(client),
-            buscar_shopee(client),
-            buscar_aliexpress(client),
-            buscar_kabum(client),
-            buscar_pichau(client),
+            buscar_pelando(client), buscar_promobit(client), buscar_zoom(client),
+            buscar_mercadolivre(client), buscar_amazon(client), buscar_shopee(client),
+            buscar_aliexpress(client), buscar_kabum(client), buscar_pichau(client),
             buscar_terabyte(client),
             return_exceptions=True
         )
     novas = 0
     for grupo in resultados:
-        if isinstance(grupo, Exception):
-            continue
+        if isinstance(grupo, Exception): continue
         for oferta in grupo:
             if oferta.id() not in vistas:
                 vistas.add(oferta.id())
@@ -354,21 +461,48 @@ async def verificar_ofertas(bot: Bot, vistas: set):
     log.info(f"✅ {novas} nova(s) oferta(s) enviada(s)")
 
 
+async def verificar_cupons(bot: Bot, cupons_vistos: set):
+    log.info("Verificando cupons...")
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        resultados = await asyncio.gather(
+            buscar_cupons_pelando(client),
+            buscar_cupons_promobit(client),
+            buscar_cupons_meliuz(client),
+            return_exceptions=True
+        )
+    novos = 0
+    for grupo in resultados:
+        if isinstance(grupo, Exception): continue
+        for cupom in grupo:
+            if cupom.id() not in cupons_vistos:
+                cupons_vistos.add(cupom.id())
+                await enviar_cupom(bot, cupom)
+                novos += 1
+                await asyncio.sleep(1)
+    salvar_cupons_vistos(cupons_vistos)
+    log.info(f"🎟️ {novos} novo(s) cupom(ns) enviado(s)")
+
+
 async def main():
     bot = Bot(token=TELEGRAM_TOKEN)
     vistas = carregar_vistas()
+    cupons_vistos = carregar_cupons_vistos()
+
     await bot.send_message(
         chat_id=TELEGRAM_CHAT_ID,
-        text="🤖 <b>Bot de Ofertas iniciado!</b>\n\n"
+        text="🤖 <b>Bot de Ofertas + Cupons iniciado!</b>\n\n"
              "Monitorando 10 lojas:\n"
              "🔥 Pelando | ⚡ Promobit | 🔍 Zoom\n"
              "🛒 Mercado Livre | 📦 Amazon | 🧡 Shopee\n"
              "🌏 AliExpress | 💥 KaBuM! | 🖥️ Pichau | 💾 Terabyte\n\n"
+             "🎟️ Cupons: Pelando, Promobit e Méliuz\n"
              "📦 Categorias: Eletrônicos, Games e Informática",
         parse_mode=ParseMode.HTML
     )
+
     while True:
         await verificar_ofertas(bot, vistas)
+        await verificar_cupons(bot, cupons_vistos)
         log.info(f"Aguardando {INTERVALO_MINUTOS} minutos...")
         await asyncio.sleep(INTERVALO_MINUTOS * 60)
 
