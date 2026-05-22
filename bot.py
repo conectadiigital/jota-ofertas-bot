@@ -321,9 +321,9 @@ async def buscar_cupons_pelando(client):
     try:
         r = await client.get("https://www.pelando.com.br/cupons", headers=HEADERS, timeout=15)
         soup = BeautifulSoup(r.text, "html.parser")
-        for card in soup.select("article, [class*='coupon'], [class*='Coupon']")[:20]:
-            loja_el = card.select_one("[class*='store'], [class*='Store'], h2, h3")
-            codigo_el = card.select_one("[class*='code'], [class*='Code'], code")
+        for card in soup.select("article, [class*='coupon']")[:20]:
+            loja_el = card.select_one("[class*='store'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], code")
             desc_el = card.select_one("[class*='desc'], [class*='title'], p")
             link_el = card.select_one("a[href]")
             if not loja_el or not link_el: continue
@@ -343,9 +343,9 @@ async def buscar_cupons_promobit(client):
     try:
         r = await client.get("https://www.promobit.com.br/cupons", headers=HEADERS, timeout=15)
         soup = BeautifulSoup(r.text, "html.parser")
-        for card in soup.select("[class*='coupon'], [class*='cupom'], article")[:20]:
+        for card in soup.select("[class*='coupon'], article")[:20]:
             loja_el = card.select_one("[class*='store'], [class*='brand'], h2, h3")
-            codigo_el = card.select_one("[class*='code'], [class*='codigo'], code")
+            codigo_el = card.select_one("[class*='code'], code")
             desc_el = card.select_one("[class*='desc'], [class*='title'], p")
             link_el = card.select_one("a[href]")
             if not loja_el or not link_el: continue
@@ -379,6 +379,160 @@ async def buscar_cupons_meliuz(client):
             cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Méliuz"))
     except Exception as e:
         log.warning(f"Cupons Méliuz erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_kabum(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.kabum.com.br/cupom-de-desconto", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='coupon'], [class*='cupom'], article")[:20]:
+            loja_el = card.select_one("[class*='store'], [class*='title'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], [class*='codigo'], code")
+            desc_el = card.select_one("[class*='desc'], p")
+            link_el = card.select_one("a[href]")
+            if not link_el: continue
+            loja = loja_el.get_text(strip=True) if loja_el else "KaBuM!"
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom KaBuM!"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.kabum.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="KaBuM!"))
+    except Exception as e:
+        log.warning(f"Cupons KaBuM! erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_pichau(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.pichau.com.br/cupom-de-desconto", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='coupon'], [class*='cupom'], article")[:20]:
+            loja_el = card.select_one("[class*='title'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], code")
+            desc_el = card.select_one("[class*='desc'], p")
+            link_el = card.select_one("a[href]")
+            if not link_el: continue
+            loja = loja_el.get_text(strip=True) if loja_el else "Pichau"
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom Pichau"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.pichau.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Pichau"))
+    except Exception as e:
+        log.warning(f"Cupons Pichau erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_terabyte(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.terabyteshop.com.br/cupons", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='coupon'], [class*='cupom'], article")[:20]:
+            loja_el = card.select_one("[class*='title'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], code")
+            desc_el = card.select_one("[class*='desc'], p")
+            link_el = card.select_one("a[href]")
+            if not link_el: continue
+            loja = loja_el.get_text(strip=True) if loja_el else "Terabyte"
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom Terabyte"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.terabyteshop.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Terabyte"))
+    except Exception as e:
+        log.warning(f"Cupons Terabyte erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_shopee(client):
+    cupons = []
+    try:
+        r = await client.get("https://shopee.com.br/m/voucher-code", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='voucher'], [class*='coupon'], article")[:20]:
+            loja_el = card.select_one("[class*='title'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], code")
+            desc_el = card.select_one("[class*='desc'], p")
+            link_el = card.select_one("a[href]")
+            if not link_el: continue
+            loja = loja_el.get_text(strip=True) if loja_el else "Shopee"
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom Shopee"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://shopee.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Shopee"))
+    except Exception as e:
+        log.warning(f"Cupons Shopee erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_aliexpress(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.aliexpress.com/coupon/coupons.html", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='coupon'], [class*='voucher']")[:20]:
+            loja_el = card.select_one("[class*='title'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], code")
+            desc_el = card.select_one("[class*='desc'], p")
+            link_el = card.select_one("a[href]")
+            if not link_el: continue
+            loja = loja_el.get_text(strip=True) if loja_el else "AliExpress"
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom AliExpress"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.aliexpress.com{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="AliExpress"))
+    except Exception as e:
+        log.warning(f"Cupons AliExpress erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_amazon(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.amazon.com.br/coupons", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='coupon'], [data-asin]")[:20]:
+            loja_el = card.select_one("[class*='title'], h2, h3, a")
+            codigo_el = card.select_one("[class*='code'], [class*='discount']")
+            desc_el = card.select_one("[class*='desc'], p")
+            link_el = card.select_one("a[href]")
+            if not link_el: continue
+            loja = loja_el.get_text(strip=True) if loja_el else "Amazon"
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom Amazon"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.amazon.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Amazon"))
+    except Exception as e:
+        log.warning(f"Cupons Amazon erro: {e}")
+    return cupons
+
+
+async def buscar_cupons_mercadolivre(client):
+    cupons = []
+    try:
+        r = await client.get("https://www.mercadolivre.com.br/cupons-de-desconto", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        for card in soup.select("[class*='coupon'], [class*='cupom'], article")[:20]:
+            loja_el = card.select_one("[class*='store'], [class*='title'], h2, h3")
+            codigo_el = card.select_one("[class*='code'], [class*='codigo']")
+            desc_el = card.select_one("[class*='desc'], p")
+            link_el = card.select_one("a[href]")
+            if not link_el: continue
+            loja = loja_el.get_text(strip=True) if loja_el else "Mercado Livre"
+            codigo = codigo_el.get_text(strip=True) if codigo_el else "Ver site"
+            descricao = desc_el.get_text(strip=True) if desc_el else "Cupom Mercado Livre"
+            href = link_el["href"]
+            link = href if href.startswith("http") else f"https://www.mercadolivre.com.br{href}"
+            cupons.append(Cupom(loja=loja, codigo=codigo, descricao=descricao, link=link, fonte="Mercado Livre"))
+    except Exception as e:
+        log.warning(f"Cupons Mercado Livre erro: {e}")
     return cupons
 
 
@@ -465,9 +619,11 @@ async def verificar_cupons(bot: Bot, cupons_vistos: set):
     log.info("Verificando cupons...")
     async with httpx.AsyncClient(follow_redirects=True) as client:
         resultados = await asyncio.gather(
-            buscar_cupons_pelando(client),
-            buscar_cupons_promobit(client),
-            buscar_cupons_meliuz(client),
+            buscar_cupons_pelando(client), buscar_cupons_promobit(client),
+            buscar_cupons_meliuz(client), buscar_cupons_kabum(client),
+            buscar_cupons_pichau(client), buscar_cupons_terabyte(client),
+            buscar_cupons_shopee(client), buscar_cupons_aliexpress(client),
+            buscar_cupons_amazon(client), buscar_cupons_mercadolivre(client),
             return_exceptions=True
         )
     novos = 0
@@ -491,11 +647,8 @@ async def main():
     await bot.send_message(
         chat_id=TELEGRAM_CHAT_ID,
         text="🤖 <b>Bot de Ofertas + Cupons iniciado!</b>\n\n"
-             "Monitorando 10 lojas:\n"
-             "🔥 Pelando | ⚡ Promobit | 🔍 Zoom\n"
-             "🛒 Mercado Livre | 📦 Amazon | 🧡 Shopee\n"
-             "🌏 AliExpress | 💥 KaBuM! | 🖥️ Pichau | 💾 Terabyte\n\n"
-             "🎟️ Cupons: Pelando, Promobit e Méliuz\n"
+             "🛍️ <b>Ofertas:</b> Pelando, Promobit, Zoom, Mercado Livre, Amazon, Shopee, AliExpress, KaBuM!, Pichau e Terabyte\n\n"
+             "🎟️ <b>Cupons:</b> Pelando, Promobit, Méliuz, KaBuM!, Pichau, Terabyte, Shopee, AliExpress, Amazon e Mercado Livre\n\n"
              "📦 Categorias: Eletrônicos, Games e Informática",
         parse_mode=ParseMode.HTML
     )
