@@ -86,11 +86,8 @@ class Cupom:
 
 
 def eh_relevante(titulo: str) -> bool:
-    t = titulo.lower()
-    return any(cat in t for cat in CATEGORIAS)
+    return True
 
-
-# ─── RSS (tempo real) ─────────────────────────────────────────────────────────
 
 async def buscar_rss_pelando(client):
     ofertas = []
@@ -113,8 +110,7 @@ async def buscar_rss_pelando(client):
                     preco = preco_el.get_text(strip=True) if preco_el else "Ver site"
                     img_el = soup.find("img") if soup else None
                     imagem = img_el.get("src") if img_el else None
-                    if eh_relevante(titulo):
-                        ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Pelando 🔴", imagem=imagem))
+                    ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Pelando 🔴", imagem=imagem))
                 if ofertas:
                     break
             except:
@@ -145,8 +141,7 @@ async def buscar_rss_promobit(client):
                     preco = preco_el.get_text(strip=True) if preco_el else "Ver site"
                     img_el = soup.find("img") if soup else None
                     imagem = img_el.get("src") if img_el else None
-                    if eh_relevante(titulo):
-                        ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Promobit ⚡", imagem=imagem))
+                    ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Promobit ⚡", imagem=imagem))
                 if ofertas:
                     break
             except:
@@ -155,8 +150,6 @@ async def buscar_rss_promobit(client):
         log.warning(f"RSS Promobit erro: {e}")
     return ofertas
 
-
-# ─── SCRAPING ─────────────────────────────────────────────────────────────────
 
 async def buscar_zoom(client):
     ofertas = []
@@ -192,8 +185,7 @@ async def buscar_mercadolivre(client):
                 if not titulo_el or not link_el: continue
                 titulo = titulo_el.get_text(strip=True)
                 preco = "R$ " + preco_el.get_text(strip=True) if preco_el else "Ver site"
-                if eh_relevante(titulo):
-                    ofertas.append(Oferta(titulo=titulo, preco=preco, link=link_el["href"], fonte="Mercado Livre"))
+                ofertas.append(Oferta(titulo=titulo, preco=preco, link=link_el["href"], fonte="Mercado Livre"))
     except Exception as e:
         log.warning(f"Mercado Livre erro: {e}")
     return ofertas
@@ -238,8 +230,7 @@ async def buscar_shopee(client):
                 preco = preco_el.get_text(strip=True) if preco_el else "Ver site"
                 href = link_el["href"]
                 link = href if href.startswith("http") else f"https://shopee.com.br{href}"
-                if eh_relevante(titulo):
-                    ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Shopee"))
+                ofertas.append(Oferta(titulo=titulo, preco=preco, link=link, fonte="Shopee"))
     except Exception as e:
         log.warning(f"Shopee erro: {e}")
     return ofertas
@@ -334,8 +325,6 @@ async def buscar_terabyte(client):
         log.warning(f"Terabyte erro: {e}")
     return ofertas
 
-
-# ─── CUPONS ───────────────────────────────────────────────────────────────────
 
 async def buscar_cupons_pelando(client):
     cupons = []
@@ -557,8 +546,6 @@ async def buscar_cupons_mercadolivre(client):
     return cupons
 
 
-# ─── FORMATAR E ENVIAR ────────────────────────────────────────────────────────
-
 def formatar_oferta(oferta: Oferta) -> str:
     emoji = {
         "Pelando 🔴": "🔥", "Promobit ⚡": "⚡", "Zoom": "🔍",
@@ -610,8 +597,6 @@ async def enviar_cupom(bot: Bot, cupom: Cupom):
     except Exception as e:
         log.warning(f"Erro ao enviar cupom: {e}")
 
-
-# ─── LOOP PRINCIPAL ───────────────────────────────────────────────────────────
 
 async def verificar_ofertas(bot: Bot, vistas: set):
     log.info("Verificando ofertas...")
@@ -667,11 +652,11 @@ async def main():
 
     await bot.send_message(
         chat_id=TELEGRAM_CHAT_ID,
-        text="🤖 <b>Bot atualizado — Modo tempo real!</b>\n\n"
-             "🔴 Pelando e Promobit via RSS (tempo real)\n"
+        text="🤖 <b>Bot atualizado — Sem filtro de categoria!</b>\n\n"
+             "Agora envia qualquer oferta encontrada.\n"
+             "🔴 Pelando e Promobit via RSS\n"
              "🛍️ Demais lojas a cada 30 segundos\n"
-             "🎟️ Cupons de 10 fontes\n\n"
-             "📦 Categorias: Eletrônicos, Games e Informática",
+             "🎟️ Cupons de 10 fontes",
         parse_mode=ParseMode.HTML
     )
 
