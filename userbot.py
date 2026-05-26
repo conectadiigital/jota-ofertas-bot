@@ -37,7 +37,7 @@ FILTROS = [
     "smartphone", "celular", "iphone", "samsung", "xiaomi", "motorola",
     "tablet", "ipad", "smartwatch", "fone de ouvido", "earphone", "airpods",
     "caixa de som", "câmera", "carregador", "bateria", "tv", "smart tv",
-    "projetor",
+    "projetor", "ar-condicionado", "ar condicionado",
     # Games
     "console", "playstation", "xbox", "nintendo", "switch",
     "controle", "joystick", "game", "jogo", "steam", "epic games",
@@ -104,7 +104,7 @@ async def main():
         chat_id=TELEGRAM_CHAT_ID,
         text="🤖 <b>Userbot atualizado com filtros!</b>\n\n"
              "Monitorando 9 canais em tempo real\n"
-             "✅ Filtro ativo: Cupons, Tecnologia, Informática, Games e Eletrônicos",
+             "✅ Filtro ativo: Cupons, Tecnologia, Informática, Games, Eletrônicos e Ar-condicionado",
         parse_mode=ParseMode.HTML
     )
     log.info("Userbot rodando...")
