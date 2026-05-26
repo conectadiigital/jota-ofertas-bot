@@ -46,7 +46,7 @@ FILTROS = [
     # Informática
     "notebook", "laptop", "macbook", "computador", "pc gamer", "monitor", "teclado",
     "mouse", "headset", "mousepad", "webcam", "impressora", "roteador",
-    "cabo", "hub", "memória ram", "ssd", "hd", "processador", "placa mãe",
+    "hub", "memória ram", "ssd", "hd", "processador", "placa mãe",
     "placa de vídeo", "gpu", "cpu", "fonte", "gabinete", "cooler",
     "water cooler", "pendrive", "no-break",
     # Eletrônicos
@@ -68,7 +68,7 @@ BLOQUEIOS = [
     "tênis", "camiseta", "blusa", "camisa", "roupa", "calçado",
     "sandália", "chinelo", "meia", "bermuda", "shorts", "calça",
     "vestido", "saia", "jaqueta", "moletom", "agasalho", "uniforme",
-    "bolsa", "mochila", "carteira", "cinto", "boné", "chapéu",
+    "bolsa", "carteira", "cinto", "boné", "chapéu",
     # Beleza e cosméticos
     "perfume", "maquiagem", "batom", "shampoo", "condicionador",
     "protetor solar", "fps", "hidratante", "creme", "sérum",
@@ -84,6 +84,12 @@ BLOQUEIOS = [
     # Bebê e infantil
     "fralda", "fraldas", "pampers", "bebê", "bebe",
     "infantil", "criança", "mamadeira", "chupeta",
+    # Cozinha
+    "panela", "panelas", "frigideira", "wok", "caçarola",
+    "antiaderente", "cerâmico", "utensílio", "escorredor",
+    "liquidificador", "batedeira", "mixer", "airfryer", "air fryer",
+    "cafeteira", "chaleira", "forno", "micro-ondas", "microondas",
+    "talheres", "prato", "tigela", "xícara", "copo",
 ]
 # =============================================
 
@@ -158,7 +164,7 @@ async def main():
             "📡 Monitorando 10 canais em tempo real\n"
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
-            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê"
+            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha"
         ),
         parse_mode=ParseMode.HTML
     )
