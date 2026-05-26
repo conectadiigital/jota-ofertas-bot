@@ -1,4 +1,6 @@
 import logging
+import re
+from datetime import datetime, timedelta
 from telethon import TelegramClient, events
 from telegram import Bot
 from telegram.constants import ParseMode
@@ -11,6 +13,8 @@ API_HASH = "a5e4b989566d3110d9756a27363b7004"
 TELEGRAM_TOKEN = "8928368941:AAG8FAM49Wj71HixaMyaoFK1qXGQN8FvLEo"
 TELEGRAM_CHAT_ID = "-1003972490387"  # Grupo — ofertas vão aqui
 TELEGRAM_OWNER_ID = "656910452"      # Você — avisos do bot vão aqui
+
+ANTI_DUPLICATA_MINUTOS = 5
 
 CANAIS = [
     "pelandobr",
@@ -99,6 +103,53 @@ log = logging.getLogger(__name__)
 bot = Bot(token=TELEGRAM_TOKEN)
 client = TelegramClient("session", API_ID, API_HASH)
 
+# Histórico anti-duplicata: {chave: datetime}
+historico_enviados = {}
+
+
+def extrair_links(texto: str):
+    return re.findall(r'https?://\S+', texto)
+
+
+def extrair_palavras_chave(texto: str):
+    # Pega palavras com 4+ caracteres, ignora palavras comuns
+    ignorar = {"para", "com", "por", "mais", "valor", "oferta", "promo", "desc"}
+    palavras = re.findall(r'\b\w{4,}\b', texto.lower())
+    return {p for p in palavras if p not in ignorar}
+
+
+def eh_duplicata(texto: str) -> bool:
+    agora = datetime.now()
+    limite = agora - timedelta(minutes=ANTI_DUPLICATA_MINUTOS)
+
+    # Limpa histórico antigo
+    expirados = [k for k, v in historico_enviados.items() if v < limite]
+    for k in expirados:
+        del historico_enviados[k]
+
+    # Verifica por link
+    links = extrair_links(texto)
+    for link in links:
+        if link in historico_enviados:
+            log.info(f"Duplicata detectada por link: {link}")
+            return True
+
+    # Verifica por palavras-chave do título (primeira linha)
+    primeira_linha = texto.split('\n')[0].strip()
+    palavras = extrair_palavras_chave(primeira_linha)
+    chave_titulo = " ".join(sorted(palavras))
+    if chave_titulo and chave_titulo in historico_enviados:
+        log.info(f"Duplicata detectada por título: {chave_titulo}")
+        return True
+
+    # Registra no histórico
+    for link in links:
+        historico_enviados[link] = agora
+    if chave_titulo:
+        historico_enviados[chave_titulo] = agora
+
+    return False
+
 
 def eh_relevante(texto: str) -> bool:
     t = texto.lower()
@@ -129,6 +180,10 @@ async def handler(event):
                 return
             if not eh_relevante(texto):
                 return
+
+        # Anti-duplicata
+        if eh_duplicata(texto):
+            return
 
         mensagem = (
             f"🔔 <b>JJ Ofertas</b>\n\n"
@@ -164,7 +219,8 @@ async def main():
             "📡 Monitorando 10 canais em tempo real\n"
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
-            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha"
+            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha\n"
+            "🔄 Anti-duplicata: 5 minutos"
         ),
         parse_mode=ParseMode.HTML
     )
