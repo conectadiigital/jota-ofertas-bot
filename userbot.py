@@ -16,8 +16,8 @@ TELEGRAM_CHAT_ID = "656910452"
 CANAIS = [
     "pelandobr",
     "cupons_desconto",
-    "peperaio",
-    "ofertasgamer",
+    "peperaiohardware",
+    "ofertasgamer_oficial",
     "lapromotion",
 ]
 # =============================================
@@ -71,9 +71,9 @@ async def main():
         text="🤖 <b>Userbot iniciado!</b>\n\n"
              "Monitorando canais em tempo real:\n"
              "🔥 @pelandobr\n"
-             "⚡ @cupons_desconto\n"
-             "📢 @peperaio\n"
-             "🎮 @ofertasgamer\n"
+             "⚡ @cupons_desconto (Promobit)\n"
+             "🖥️ @peperaiohardware\n"
+             "🎮 @ofertasgamer_oficial\n"
              "🛒 @lapromotion",
         parse_mode=ParseMode.HTML
     )
