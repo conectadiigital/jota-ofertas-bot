@@ -22,6 +22,11 @@ CANAIS = [
     "promocoesecuponsglobais",
     "tecnoarthardware",
     "promotop",
+    "fadadoscupons",
+]
+
+CANAIS_SEM_FILTRO = [
+    "fadadoscupons",
 ]
 
 NOMES_CANAIS = {
@@ -34,6 +39,7 @@ NOMES_CANAIS = {
     "promocoesecuponsglobais": "🌎 Promoções e Cupons Globais",
     "tecnoarthardware":        "⚙️ Tecnoart Hardware",
     "promotop":                "🏆 Promo Top",
+    "fadadoscupons":           "🧚 Fada dos Cupons",
 }
 
 FILTROS = [
@@ -75,12 +81,16 @@ async def handler(event):
     try:
         msg = event.message
         texto = msg.text or msg.caption or ""
-
-        if not texto or not eh_relevante(texto):
-            return
-
         canal_username = (event.chat.username or "").lower()
         nome_exibido = NOMES_CANAIS.get(canal_username, event.chat.title or canal_username or "Desconhecido")
+
+        if not texto:
+            return
+
+        # Fada dos Cupons passa tudo sem filtro
+        if canal_username not in CANAIS_SEM_FILTRO:
+            if not eh_relevante(texto):
+                return
 
         mensagem = (
             f"🔔 <b>JJ Ofertas</b>\n\n"
@@ -113,8 +123,9 @@ async def main():
         chat_id=TELEGRAM_OWNER_ID,
         text=(
             "🤖 <b>JJ Ofertas Bot — Online!</b>\n\n"
-            "📡 Monitorando 9 canais em tempo real\n"
-            "🎯 Filtros: Informática · Eletrônicos · Games · Componentes"
+            "📡 Monitorando 10 canais em tempo real\n"
+            "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
+            "🧚 Fada dos Cupons: todas as ofertas sem filtro"
         ),
         parse_mode=ParseMode.HTML
     )
