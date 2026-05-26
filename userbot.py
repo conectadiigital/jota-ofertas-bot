@@ -19,6 +19,10 @@ CANAIS = [
     "peperaiohardware",
     "ofertasgamer_oficial",
     "lapromotion",
+    "sharkdaspromo",
+    "promocoesecuponsglobais",
+    "tecnoarthardware",
+    "promotop",
 ]
 # =============================================
 
@@ -68,13 +72,17 @@ async def handler(event):
 async def main():
     await bot.send_message(
         chat_id=TELEGRAM_CHAT_ID,
-        text="🤖 <b>Userbot iniciado!</b>\n\n"
+        text="🤖 <b>Userbot atualizado!</b>\n\n"
              "Monitorando canais em tempo real:\n"
              "🔥 @pelandobr\n"
-             "⚡ @cupons_desconto (Promobit)\n"
+             "⚡ @cupons_desconto\n"
              "🖥️ @peperaiohardware\n"
              "🎮 @ofertasgamer_oficial\n"
-             "🛒 @lapromotion",
+             "🛒 @lapromotion\n"
+             "🦈 @sharkdaspromo\n"
+             "🌍 @promocoesecuponsglobais\n"
+             "💻 @tecnoarthardware\n"
+             "🚀 @promotop\n",
         parse_mode=ParseMode.HTML
     )
     log.info("Userbot rodando...")
