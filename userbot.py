@@ -84,8 +84,7 @@ async def handler(event):
         nome_exibido = NOMES_CANAIS.get(canal_username, event.chat.title or canal_username or "Desconhecido")
 
         mensagem = (
-            f"🔔 <b>JJ Ofertas</b>\n"
-            f"📢 Fonte: <b>{nome_exibido}</b>\n\n"
+            f"🔔 <b>JJ Ofertas</b>\n\n"
             f"{texto[:800]}"
         )
 
