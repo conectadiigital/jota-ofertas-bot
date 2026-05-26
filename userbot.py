@@ -104,6 +104,13 @@ BLOQUEIOS = [
     "carne", "frango", "peixe", "presunto", "salsicha",
     "fruta", "verdura", "legume", "alho", "cebola",
     "urbano", "gluten", "espinafre", "kids",
+    # Ferramentas
+    "furadeira", "parafusadeira", "serra", "esmerilhadeira",
+    "martelo", "chave de fenda", "alicate", "nível",
+    "trena", "fita métrica", "escada", "carrinho de mão",
+    "compressor", "lavadora de pressão", "mangueira",
+    "maleta de ferramentas", "kit ferramentas", "bancada",
+    "lixadeira", "tupia", "mandril", "broca",
 ]
 # =============================================
 
@@ -228,7 +235,7 @@ async def main():
             "📡 Monitorando 10 canais em tempo real\n"
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
-            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos\n"
+            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos · Ferramentas\n"
             "🔄 Anti-duplicata: 5 minutos"
         ),
         parse_mode=ParseMode.HTML
