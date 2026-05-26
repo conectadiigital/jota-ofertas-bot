@@ -124,13 +124,31 @@ client = TelegramClient("session", API_ID, API_HASH)
 historico_enviados = {}
 
 
+def limpar_texto(texto: str) -> str:
+    # Remove emojis
+    texto = re.sub(r'[\U00010000-\U0010ffff]', '', texto, flags=re.UNICODE)
+    # Remove emojis do bloco básico
+    texto = re.sub(r'[\U00002000-\U00002BFF]', '', texto)
+    # Remove caracteres especiais como **, *, #, !, ?, etc
+    texto = re.sub(r'[*#!?🔥💥⚡🎯📢🛒✅❌🔔💰🏷️📣]', '', texto)
+    # Remove espaços extras
+    texto = re.sub(r'\s+', ' ', texto).strip()
+    return texto
+
+
 def extrair_links(texto: str):
     return re.findall(r'https?://\S+', texto)
 
 
 def extrair_palavras_chave(texto: str):
-    ignorar = {"para", "com", "por", "mais", "valor", "oferta", "promo", "desc"}
-    palavras = re.findall(r'\b\w{4,}\b', texto.lower())
+    texto = limpar_texto(texto)
+    ignorar = {
+        "para", "com", "por", "mais", "valor", "oferta", "promo",
+        "desc", "sem", "fio", "com", "the", "and", "box", "new",
+        "und", "unid", "unidade", "kit", "cor", "preto", "branco",
+        "azul", "verde", "vermelho", "rosa", "cinza"
+    }
+    palavras = re.findall(r'\b\w{3,}\b', texto.lower())
     return {p for p in palavras if p not in ignorar}
 
 
@@ -150,10 +168,12 @@ def eh_duplicata(texto: str) -> bool:
             log.info(f"Duplicata detectada por link: {link}")
             return True
 
-    # Verifica por palavras-chave do título (primeira linha)
-    primeira_linha = texto.split('\n')[0].strip()
+    # Verifica por palavras-chave do título (primeira linha não vazia)
+    linhas = [l.strip() for l in texto.split('\n') if l.strip()]
+    primeira_linha = linhas[0] if linhas else ""
     palavras = extrair_palavras_chave(primeira_linha)
     chave_titulo = " ".join(sorted(palavras))
+
     if chave_titulo and chave_titulo in historico_enviados:
         log.info(f"Duplicata detectada por título: {chave_titulo}")
         return True
