@@ -59,8 +59,28 @@ FILTROS = [
     "controle", "joystick", "game", "steam", "epic games",
     "headset gamer", "cadeira gamer", "monitor gamer",
     # Componentes
-    "rtx", "gtx", "rx", "ryzen", "intel", "amd", "nvidia", "geforce",
+    "rtx", "gtx", "ryzen", "intel", "amd", "nvidia", "geforce",
     "radeon", "core i3", "core i5", "core i7", "core i9",
+]
+
+BLOQUEIOS = [
+    # Moda e vestuário
+    "tênis", "camiseta", "blusa", "camisa", "roupa", "calçado",
+    "sandália", "chinelo", "meia", "bermuda", "shorts", "calça",
+    "vestido", "saia", "jaqueta", "moletom", "agasalho", "uniforme",
+    "bolsa", "mochila", "carteira", "cinto", "boné", "chapéu",
+    # Beleza e cosméticos
+    "perfume", "maquiagem", "batom", "shampoo", "condicionador",
+    "protetor solar", "fps", "hidratante", "creme", "sérum",
+    "desodorante", "sabonete", "esmalte", "base", "máscara",
+    # Pet
+    "cachorro", "gato", "pet", "ração", "coleira",
+    "aquário", "pássaro", "hamster",
+    # Brinquedos
+    "brinquedo", "boneca", "pelúcia", "massinha", "lego",
+    # Casa / Cama / Banho
+    "edredom", "travesseiro", "lençol", "toalha", "tapete",
+    "cortina", "almofada", "cobertor",
 ]
 # =============================================
 
@@ -76,6 +96,11 @@ def eh_relevante(texto: str) -> bool:
     return any(filtro in t for filtro in FILTROS)
 
 
+def eh_bloqueado(texto: str) -> bool:
+    t = texto.lower()
+    return any(bloqueio in t for bloqueio in BLOQUEIOS)
+
+
 @client.on(events.NewMessage(chats=CANAIS))
 async def handler(event):
     try:
@@ -87,8 +112,12 @@ async def handler(event):
         if not texto:
             return
 
-        # Fada dos Cupons passa tudo sem filtro
-        if canal_username not in CANAIS_SEM_FILTRO:
+        # Fada dos Cupons passa tudo sem filtro e sem bloqueio
+        if canal_username in CANAIS_SEM_FILTRO:
+            pass
+        else:
+            if eh_bloqueado(texto):
+                return
             if not eh_relevante(texto):
                 return
 
@@ -125,7 +154,8 @@ async def main():
             "🤖 <b>JJ Ofertas Bot — Online!</b>\n\n"
             "📡 Monitorando 10 canais em tempo real\n"
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
-            "🧚 Fada dos Cupons: todas as ofertas sem filtro"
+            "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
+            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa"
         ),
         parse_mode=ParseMode.HTML
     )
