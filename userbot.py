@@ -12,10 +12,10 @@ API_HASH = "a5e4b989566d3110d9756a27363b7004"
 TELEGRAM_TOKEN = "8928368941:AAG8FAM49Wj71HixaMyaoFK1qXGQN8FvLEo"
 TELEGRAM_CHAT_ID = "656910452"
 
-# Canais de ofertas para monitorar
+# Canais oficiais de ofertas
 CANAIS = [
-    "pelando",
-    "promobit",
+    "pelandobr",
+    "cupons_desconto",
     "peperaio",
     "ofertasgamer",
     "lapromotion",
@@ -35,7 +35,7 @@ async def handler(event):
         msg = event.message
         texto = msg.text or msg.caption or ""
         canal = event.chat.username or event.chat.title or "Desconhecido"
-        
+
         if not texto:
             return
 
@@ -69,9 +69,9 @@ async def main():
     await bot.send_message(
         chat_id=TELEGRAM_CHAT_ID,
         text="🤖 <b>Userbot iniciado!</b>\n\n"
-             "Monitorando canais de ofertas em tempo real:\n"
-             "🔥 @pelando\n"
-             "⚡ @promobit\n"
+             "Monitorando canais em tempo real:\n"
+             "🔥 @pelandobr\n"
+             "⚡ @cupons_desconto\n"
              "📢 @peperaio\n"
              "🎮 @ofertasgamer\n"
              "🛒 @lapromotion",
