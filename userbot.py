@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from telethon import TelegramClient, events
 from telegram import Bot
@@ -23,6 +22,18 @@ CANAIS = [
     "tecnoarthardware",
     "promotop",
 ]
+
+NOMES_CANAIS = {
+    "pelandobr":               "🔥 Pelando BR",
+    "cupons_desconto":         "🎟️ Cupons Desconto",
+    "peperaiohardware":        "🖥️ Peperaio Hardware",
+    "ofertasgamer_oficial":    "🎮 Ofertas Gamer",
+    "lapromotion":             "💰 La Promotion",
+    "sharkdaspromo":           "🦈 Shark das Promos",
+    "promocoesecuponsglobais": "🌎 Promoções e Cupons Globais",
+    "tecnoarthardware":        "⚙️ Tecnoart Hardware",
+    "promotop":                "🏆 Promo Top",
+}
 
 FILTROS = [
     # Cupons
@@ -65,16 +76,16 @@ async def handler(event):
     try:
         msg = event.message
         texto = msg.text or msg.caption or ""
-        canal = event.chat.username or event.chat.title or "Desconhecido"
 
-        if not texto:
+        if not texto or not eh_relevante(texto):
             return
 
-        if not eh_relevante(texto):
-            return
+        canal_username = (event.chat.username or "").lower()
+        nome_exibido = NOMES_CANAIS.get(canal_username, event.chat.title or canal_username or "Desconhecido")
 
         mensagem = (
-            f"🔔 <b>Nova oferta de @{canal}!</b>\n\n"
+            f"🔔 <b>JJ Ofertas</b>\n"
+            f"📢 Fonte: <b>{nome_exibido}</b>\n\n"
             f"{texto[:800]}"
         )
 
@@ -93,7 +104,7 @@ async def handler(event):
                 disable_web_page_preview=False
             )
 
-        log.info(f"Oferta de @{canal} enviada!")
+        log.info(f"Oferta de {nome_exibido} enviada!")
 
     except Exception as e:
         log.error(f"Erro ao processar mensagem: {e}")
@@ -102,9 +113,11 @@ async def handler(event):
 async def main():
     await bot.send_message(
         chat_id=TELEGRAM_CHAT_ID,
-        text="🤖 <b>Userbot atualizado com filtros!</b>\n\n"
-             "Monitorando 9 canais em tempo real\n"
-             "✅ Filtro ativo: Cupons, Tecnologia, Informática, Games, Eletrônicos e Ar-condicionado",
+        text=(
+            "🤖 <b>JJ Ofertas Bot — Online!</b>\n\n"
+            "📡 Monitorando 9 canais em tempo real\n"
+            "🎯 Filtros: Cupons · Informática · Eletrônicos · Games · Componentes"
+        ),
         parse_mode=ParseMode.HTML
     )
     log.info("Userbot rodando...")
