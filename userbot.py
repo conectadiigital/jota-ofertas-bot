@@ -36,8 +36,6 @@ NOMES_CANAIS = {
 }
 
 FILTROS = [
-    # Cupons
-    "cupom", "cupons",
     # Informática
     "notebook", "laptop", "macbook", "computador", "pc gamer", "monitor", "teclado",
     "mouse", "headset", "mousepad", "webcam", "impressora", "roteador",
@@ -115,7 +113,7 @@ async def main():
         text=(
             "🤖 <b>JJ Ofertas Bot — Online!</b>\n\n"
             "📡 Monitorando 9 canais em tempo real\n"
-            "🎯 Filtros: Cupons · Informática · Eletrônicos · Games · Componentes"
+            "🎯 Filtros: Informática · Eletrônicos · Games · Componentes"
         ),
         parse_mode=ParseMode.HTML
     )
