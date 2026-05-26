@@ -95,6 +95,15 @@ BLOQUEIOS = [
     "liquidificador", "batedeira", "mixer", "airfryer", "air fryer",
     "cafeteira", "chaleira", "forno", "micro-ondas", "microondas",
     "talheres", "prato", "tigela", "xícara", "copo",
+    # Alimentos
+    "macarrão", "massa", "arroz", "feijão", "farinha", "açúcar",
+    "café", "leite", "queijo", "iogurte", "manteiga", "margarina",
+    "óleo", "azeite", "molho", "tempero", "sal", "pimenta",
+    "biscoito", "bolacha", "chocolate", "bala", "sorvete",
+    "suco", "refrigerante", "água", "cerveja", "vinho",
+    "carne", "frango", "peixe", "presunto", "salsicha",
+    "fruta", "verdura", "legume", "alho", "cebola",
+    "urbano", "gluten", "espinafre", "kids",
 ]
 # =============================================
 
@@ -219,7 +228,7 @@ async def main():
             "📡 Monitorando 10 canais em tempo real\n"
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
-            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha\n"
+            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos\n"
             "🔄 Anti-duplicata: 5 minutos"
         ),
         parse_mode=ParseMode.HTML
