@@ -15,6 +15,7 @@ TELEGRAM_CHAT_ID = "-1003972490387"  # Grupo — ofertas vão aqui
 TELEGRAM_OWNER_ID = "656910452"      # Você — avisos do bot vão aqui
 
 ANTI_DUPLICATA_MINUTOS = 5
+ANTI_DUPLICATA_PALAVRAS = 4  # Mínimo de palavras iguais para considerar duplicata
 
 CANAIS = [
     "pelandobr",
@@ -123,33 +124,36 @@ client = TelegramClient("session", API_ID, API_HASH)
 # Histórico anti-duplicata: {chave: datetime}
 historico_enviados = {}
 
+PALAVRAS_IGNORAR = {
+    "para", "com", "por", "mais", "valor", "oferta", "promo", "desc",
+    "sem", "fio", "the", "and", "box", "new", "und", "unid", "unidade",
+    "kit", "cor", "preto", "branco", "azul", "verde", "vermelho", "rosa",
+    "cinza", "novo", "nova", "lacrado", "lacrada", "original", "oficial",
+    "garantia", "anos", "ano", "meses", "gratis", "free", "plus", "pro",
+    "max", "mini", "ultra", "series", "serie", "edition", "versao",
+}
+
 
 def limpar_texto(texto: str) -> str:
-    # Remove emojis
-    texto = re.sub(r'[\U00010000-\U0010ffff]', '', texto, flags=re.UNICODE)
-    # Remove emojis do bloco básico
-    texto = re.sub(r'[\U00002000-\U00002BFF]', '', texto)
-    # Remove caracteres especiais como **, *, #, !, ?, etc
-    texto = re.sub(r'[*#!?🔥💥⚡🎯📢🛒✅❌🔔💰🏷️📣]', '', texto)
+    # Remove emojis e caracteres especiais
+    texto = re.sub(r'[^\w\s]', ' ', texto, flags=re.UNICODE)
     # Remove espaços extras
     texto = re.sub(r'\s+', ' ', texto).strip()
-    return texto
+    return texto.lower()
 
 
-def extrair_links(texto: str):
+def extrair_palavras_chave(texto: str) -> set:
+    texto = limpar_texto(texto)
+    palavras = re.findall(r'\b\w{3,}\b', texto)
+    return {p for p in palavras if p not in PALAVRAS_IGNORAR}
+
+
+def extrair_links(texto: str) -> list:
     return re.findall(r'https?://\S+', texto)
 
 
-def extrair_palavras_chave(texto: str):
-    texto = limpar_texto(texto)
-    ignorar = {
-        "para", "com", "por", "mais", "valor", "oferta", "promo",
-        "desc", "sem", "fio", "com", "the", "and", "box", "new",
-        "und", "unid", "unidade", "kit", "cor", "preto", "branco",
-        "azul", "verde", "vermelho", "rosa", "cinza"
-    }
-    palavras = re.findall(r'\b\w{3,}\b', texto.lower())
-    return {p for p in palavras if p not in ignorar}
+def similaridade(palavras1: set, palavras2: set) -> int:
+    return len(palavras1 & palavras2)
 
 
 def eh_duplicata(texto: str) -> bool:
@@ -168,20 +172,24 @@ def eh_duplicata(texto: str) -> bool:
             log.info(f"Duplicata detectada por link: {link}")
             return True
 
-    # Verifica por palavras-chave do título (primeira linha não vazia)
+    # Extrai palavras-chave da primeira linha não vazia
     linhas = [l.strip() for l in texto.split('\n') if l.strip()]
     primeira_linha = linhas[0] if linhas else ""
-    palavras = extrair_palavras_chave(primeira_linha)
-    chave_titulo = " ".join(sorted(palavras))
+    palavras_novas = extrair_palavras_chave(primeira_linha)
 
-    if chave_titulo and chave_titulo in historico_enviados:
-        log.info(f"Duplicata detectada por título: {chave_titulo}")
-        return True
+    # Verifica similaridade com histórico
+    for chave, _ in list(historico_enviados.items()):
+        if chave.startswith("titulo:"):
+            palavras_hist = set(chave.replace("titulo:", "").split())
+            if similaridade(palavras_novas, palavras_hist) >= ANTI_DUPLICATA_PALAVRAS:
+                log.info(f"Duplicata detectada por similaridade: {palavras_novas & palavras_hist}")
+                return True
 
     # Registra no histórico
     for link in links:
         historico_enviados[link] = agora
-    if chave_titulo:
+    if palavras_novas:
+        chave_titulo = "titulo:" + " ".join(sorted(palavras_novas))
         historico_enviados[chave_titulo] = agora
 
     return False
@@ -256,7 +264,7 @@ async def main():
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
             "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos · Ferramentas\n"
-            "🔄 Anti-duplicata: 5 minutos"
+            "🔄 Anti-duplicata: 5 minutos · 4 palavras"
         ),
         parse_mode=ParseMode.HTML
     )
