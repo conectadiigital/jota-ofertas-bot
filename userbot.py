@@ -81,6 +81,9 @@ BLOQUEIOS = [
     # Casa / Cama / Banho
     "edredom", "travesseiro", "lençol", "toalha", "tapete",
     "cortina", "almofada", "cobertor",
+    # Bebê e infantil
+    "fralda", "fraldas", "pampers", "bebê", "bebe",
+    "infantil", "criança", "mamadeira", "chupeta",
 ]
 # =============================================
 
@@ -155,7 +158,7 @@ async def main():
             "📡 Monitorando 10 canais em tempo real\n"
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
-            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa"
+            "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê"
         ),
         parse_mode=ParseMode.HTML
     )
