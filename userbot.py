@@ -58,6 +58,7 @@ FILTROS = [
     "tablet", "ipad", "smartwatch", "fone de ouvido", "earphone", "airpods",
     "caixa de som", "câmera", "carregador", "bateria", "tv", "smart tv",
     "projetor", "ar-condicionado", "ar condicionado",
+    "fire tv stick", "roku streaming",
     # Games
     "console", "playstation", "xbox", "nintendo", "switch",
     "controle", "joystick", "game", "steam", "epic games",
@@ -112,7 +113,6 @@ def extrair_links(texto: str):
 
 
 def extrair_palavras_chave(texto: str):
-    # Pega palavras com 4+ caracteres, ignora palavras comuns
     ignorar = {"para", "com", "por", "mais", "valor", "oferta", "promo", "desc"}
     palavras = re.findall(r'\b\w{4,}\b', texto.lower())
     return {p for p in palavras if p not in ignorar}
