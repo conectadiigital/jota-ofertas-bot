@@ -9,7 +9,8 @@ from telegram.constants import ParseMode
 API_ID = 35990342
 API_HASH = "a5e4b989566d3110d9756a27363b7004"
 TELEGRAM_TOKEN = "8928368941:AAG8FAM49Wj71HixaMyaoFK1qXGQN8FvLEo"
-TELEGRAM_CHAT_ID = "-1003972490387"
+TELEGRAM_CHAT_ID = "-1003972490387"  # Grupo — ofertas vão aqui
+TELEGRAM_OWNER_ID = "656910452"      # Você — avisos do bot vão aqui
 
 CANAIS = [
     "pelandobr",
@@ -109,7 +110,7 @@ async def handler(event):
 
 async def main():
     await bot.send_message(
-        chat_id=TELEGRAM_CHAT_ID,
+        chat_id=TELEGRAM_OWNER_ID,
         text=(
             "🤖 <b>JJ Ofertas Bot — Online!</b>\n\n"
             "📡 Monitorando 9 canais em tempo real\n"
