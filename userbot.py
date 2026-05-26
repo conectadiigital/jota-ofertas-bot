@@ -49,7 +49,7 @@ FILTROS = [
     "projetor", "ar-condicionado", "ar condicionado",
     # Games
     "console", "playstation", "xbox", "nintendo", "switch",
-    "controle", "joystick", "game", "jogo", "steam", "epic games",
+    "controle", "joystick", "game", "steam", "epic games",
     "headset gamer", "cadeira gamer", "monitor gamer",
     # Componentes
     "rtx", "gtx", "rx", "ryzen", "intel", "amd", "nvidia", "geforce",
