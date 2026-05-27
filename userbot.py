@@ -15,7 +15,7 @@ TELEGRAM_CHAT_ID = "-1003972490387"  # Grupo — ofertas vão aqui
 TELEGRAM_OWNER_ID = "656910452"      # Você — avisos do bot vão aqui
 
 ANTI_DUPLICATA_MINUTOS = 5
-ANTI_DUPLICATA_PALAVRAS = 4
+ANTI_DUPLICATA_PALAVRAS = 3
 
 CANAIS = [
     "pelandobr",
@@ -114,7 +114,6 @@ BLOQUEIOS = [
     "lixadeira", "tupia", "mandril", "broca",
 ]
 
-# Frases que indicam início de propaganda — texto é cortado a partir daqui
 CORTAR_A_PARTIR_DE = [
     "participe do nosso",
     "participe do meu",
@@ -291,7 +290,7 @@ async def main():
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
             "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos · Ferramentas\n"
-            "🔄 Anti-duplicata: 5 minutos · 4 palavras\n"
+            "🔄 Anti-duplicata: 5 minutos · 3 palavras\n"
             "✂️ Corte automático de propaganda"
         ),
         parse_mode=ParseMode.HTML
