@@ -15,7 +15,7 @@ TELEGRAM_CHAT_ID = "-1003972490387"  # Grupo — ofertas vão aqui
 TELEGRAM_OWNER_ID = "656910452"      # Você — avisos do bot vão aqui
 
 ANTI_DUPLICATA_MINUTOS = 5
-ANTI_DUPLICATA_PALAVRAS = 4  # Mínimo de palavras iguais para considerar duplicata
+ANTI_DUPLICATA_PALAVRAS = 4
 
 CANAIS = [
     "pelandobr",
@@ -113,6 +113,24 @@ BLOQUEIOS = [
     "maleta de ferramentas", "kit ferramentas", "bancada",
     "lixadeira", "tupia", "mandril", "broca",
 ]
+
+# Frases que indicam início de propaganda — texto é cortado a partir daqui
+CORTAR_A_PARTIR_DE = [
+    "participe do nosso",
+    "participe do meu",
+    "nosso outro grupo",
+    "nosso grupo de ofertas",
+    "promoções no whatsapp",
+    "promoções gerais",
+    "entre no nosso",
+    "entre no meu",
+    "acesse nosso canal",
+    "acesse nosso grupo",
+    "siga nosso canal",
+    "whatsapp.com/channel",
+    "#anúncio",
+    "#anuncio",
+]
 # =============================================
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -121,7 +139,6 @@ log = logging.getLogger(__name__)
 bot = Bot(token=TELEGRAM_TOKEN)
 client = TelegramClient("session", API_ID, API_HASH)
 
-# Histórico anti-duplicata: {chave: datetime}
 historico_enviados = {}
 
 PALAVRAS_IGNORAR = {
@@ -134,10 +151,17 @@ PALAVRAS_IGNORAR = {
 }
 
 
+def cortar_propaganda(texto: str) -> str:
+    t_lower = texto.lower()
+    for frase in CORTAR_A_PARTIR_DE:
+        idx = t_lower.find(frase)
+        if idx != -1:
+            texto = texto[:idx].strip()
+    return texto
+
+
 def limpar_texto(texto: str) -> str:
-    # Remove emojis e caracteres especiais
     texto = re.sub(r'[^\w\s]', ' ', texto, flags=re.UNICODE)
-    # Remove espaços extras
     texto = re.sub(r'\s+', ' ', texto).strip()
     return texto.lower()
 
@@ -160,32 +184,27 @@ def eh_duplicata(texto: str) -> bool:
     agora = datetime.now()
     limite = agora - timedelta(minutes=ANTI_DUPLICATA_MINUTOS)
 
-    # Limpa histórico antigo
     expirados = [k for k, v in historico_enviados.items() if v < limite]
     for k in expirados:
         del historico_enviados[k]
 
-    # Verifica por link
     links = extrair_links(texto)
     for link in links:
         if link in historico_enviados:
             log.info(f"Duplicata detectada por link: {link}")
             return True
 
-    # Extrai palavras-chave da primeira linha não vazia
     linhas = [l.strip() for l in texto.split('\n') if l.strip()]
     primeira_linha = linhas[0] if linhas else ""
     palavras_novas = extrair_palavras_chave(primeira_linha)
 
-    # Verifica similaridade com histórico
-    for chave, _ in list(historico_enviados.items()):
+    for chave in list(historico_enviados.keys()):
         if chave.startswith("titulo:"):
             palavras_hist = set(chave.replace("titulo:", "").split())
             if similaridade(palavras_novas, palavras_hist) >= ANTI_DUPLICATA_PALAVRAS:
                 log.info(f"Duplicata detectada por similaridade: {palavras_novas & palavras_hist}")
                 return True
 
-    # Registra no histórico
     for link in links:
         historico_enviados[link] = agora
     if palavras_novas:
@@ -212,6 +231,12 @@ async def handler(event):
         texto = msg.text or msg.caption or ""
         canal_username = (event.chat.username or "").lower()
         nome_exibido = NOMES_CANAIS.get(canal_username, event.chat.title or canal_username or "Desconhecido")
+
+        if not texto:
+            return
+
+        # Corta propaganda do final do texto
+        texto = cortar_propaganda(texto)
 
         if not texto:
             return
@@ -264,7 +289,8 @@ async def main():
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
             "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos · Ferramentas\n"
-            "🔄 Anti-duplicata: 5 minutos · 4 palavras"
+            "🔄 Anti-duplicata: 5 minutos · 4 palavras\n"
+            "✂️ Corte automático de propaganda"
         ),
         parse_mode=ParseMode.HTML
     )
