@@ -128,6 +128,8 @@ CORTAR_A_PARTIR_DE = [
     "acesse nosso grupo",
     "siga nosso canal",
     "whatsapp.com/channel",
+    "link pra entrar no grupo",
+    "link para entrar no grupo",
     "#anúncio",
     "#anuncio",
 ]
