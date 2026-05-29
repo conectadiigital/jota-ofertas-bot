@@ -79,6 +79,9 @@ BLOQUEIOS = [
     "perfume", "maquiagem", "batom", "shampoo", "condicionador",
     "protetor solar", "fps", "hidratante", "creme", "sérum",
     "desodorante", "sabonete", "esmalte", "base", "máscara",
+    "body spray", "desodorante spray", "body lotion", "body cream",
+    "boticário", "o boticário", "floratta", "egeo",
+    "loção", "gel", "tônico", "micellar", "água micelar",
     # Pet
     "cachorro", "gato", "pet", "ração", "coleira",
     "aquário", "pássaro", "hamster",
