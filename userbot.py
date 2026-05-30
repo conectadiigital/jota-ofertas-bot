@@ -145,7 +145,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger(__name__)
 
 bot = Bot(token=TELEGRAM_TOKEN)
-client = TelegramClient("jotaofertas", API_ID, API_HASH)
+client = TelegramClient("session", API_ID, API_HASH)
 
 historico_enviados = {}
 
