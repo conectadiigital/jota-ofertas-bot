@@ -10,9 +10,9 @@ from telegram.constants import ParseMode
 # =============================================
 API_ID = 35990342
 API_HASH = "a5e4b989566d3110d9756a27363b7004"
-TELEGRAM_TOKEN = "8928368941:AAG8FAM49Wj71HixaMyaoFK1qXGQN8FvLEo"
-TELEGRAM_CHAT_ID = "-1003972490387"  # Grupo — ofertas vão aqui
-TELEGRAM_OWNER_ID = "656910452"      # Você — avisos do bot vão aqui
+TELEGRAM_TOKEN = "8625612683:AAEc3prPY2VqtAF6s9u-agrPE7BdM6SuFDA"
+TELEGRAM_CHAT_ID = "-1003923063277"  # Canal JOTA OFERTAS
+TELEGRAM_OWNER_ID = "8889687119"     # Você — avisos do bot vão aqui
 
 ANTI_DUPLICATA_MINUTOS = 5
 ANTI_DUPLICATA_PALAVRAS = 3
@@ -24,10 +24,12 @@ CANAIS = [
     "ofertasgamer_oficial",
     "lapromotion",
     "sharkdaspromo",
-    "promocoesecuponsglobais",
     "tecnoarthardware",
     "promotop",
     "fadadoscupons",
+    "BenchPromos",
+    "TJGOFERTASs",
+    "pcdofafapromo",
 ]
 
 CANAIS_SEM_FILTRO = [
@@ -35,16 +37,18 @@ CANAIS_SEM_FILTRO = [
 ]
 
 NOMES_CANAIS = {
-    "pelandobr":               "🔥 Pelando BR",
-    "cupons_desconto":         "🎟️ Cupons Desconto",
-    "peperaiohardware":        "🖥️ Peperaio Hardware",
-    "ofertasgamer_oficial":    "🎮 Ofertas Gamer",
-    "lapromotion":             "💰 La Promotion",
-    "sharkdaspromo":           "🦈 Shark das Promos",
-    "promocoesecuponsglobais": "🌎 Promoções e Cupons Globais",
-    "tecnoarthardware":        "⚙️ Tecnoart Hardware",
-    "promotop":                "🏆 Promo Top",
-    "fadadoscupons":           "🧚 Fada dos Cupons",
+    "pelandobr":            "🔥 Pelando BR",
+    "cupons_desconto":      "🎟️ Cupons Desconto",
+    "peperaiohardware":     "🖥️ Peperaio Hardware",
+    "ofertasgamer_oficial": "🎮 Ofertas Gamer",
+    "lapromotion":          "💰 La Promotion",
+    "sharkdaspromo":        "🦈 Shark das Promos",
+    "tecnoarthardware":     "⚙️ Tecnoart Hardware",
+    "promotop":             "🏆 Promo Top",
+    "fadadoscupons":        "🧚 Fada dos Cupons",
+    "benchpromos":          "🖥️ Bench Promos",
+    "tjgofertass":          "🛒 TJG Ofertas",
+    "pcdofafapromo":        "💻 PC do Fafa Promo",
 }
 
 FILTROS = [
@@ -239,13 +243,11 @@ async def handler(event):
         if not texto:
             return
 
-        # Corta propaganda do final do texto
         texto = cortar_propaganda(texto)
 
         if not texto:
             return
 
-        # Fada dos Cupons passa tudo sem filtro e sem bloqueio
         if canal_username in CANAIS_SEM_FILTRO:
             pass
         else:
@@ -254,12 +256,11 @@ async def handler(event):
             if not eh_relevante(texto):
                 return
 
-        # Anti-duplicata
         if eh_duplicata(texto):
             return
 
         mensagem = (
-            f"🔔 <b>JJ Ofertas</b>\n\n"
+            f"🔔 <b>JOTA Ofertas</b>\n\n"
             f"{texto[:800]}"
         )
 
@@ -288,8 +289,8 @@ async def main():
     await bot.send_message(
         chat_id=TELEGRAM_OWNER_ID,
         text=(
-            "🤖 <b>JJ Ofertas Bot — Online!</b>\n\n"
-            "📡 Monitorando 10 canais em tempo real\n"
+            "🤖 <b>JOTA Ofertas Bot — Online!</b>\n\n"
+            "📡 Monitorando 12 canais em tempo real\n"
             "🎯 Filtros: Informática · Eletrônicos · Games · Componentes\n"
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
             "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos · Ferramentas\n"
