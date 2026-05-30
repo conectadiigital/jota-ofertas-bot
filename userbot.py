@@ -148,7 +148,7 @@ COMANDOS_BLOQUEADOS = [
     "/promote", "/fullpromote", "/approve",
     "/addadmin", "/ban", "/kick", "/mute",
     "/pin", "/unpin", "/del", "/purge",
-    "@maybeatools", "maybeatools",
+    "@maybeatools", "maybeatools", "7261453305",
 ]
 # =============================================
 
