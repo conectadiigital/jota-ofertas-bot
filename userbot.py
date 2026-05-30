@@ -12,7 +12,7 @@ from telegram.constants import ParseMode
 # =============================================
 API_ID = 35990342
 API_HASH = "a5e4b989566d3110d9756a27363b7004"
-TELEGRAM_TOKEN = "8625612683:AAEc3prPY2VqtAF6s9u-agrPE7BdM6SuFDA"
+TELEGRAM_TOKEN = "8625612683:AAHPO-hChEgsawsCsyThdy6GhPKzUkagkv4"
 TELEGRAM_CHAT_ID = "-1003923063277"  # Canal JOTA OFERTAS
 TELEGRAM_OWNER_ID = "8889687119"     # Você — avisos do bot vão aqui
 STRING_SESSION = os.environ.get("STRING_SESSION", "")
@@ -262,7 +262,6 @@ async def handler(event):
         if not texto:
             return
 
-        # Bloqueia comandos maliciosos
         if eh_comando_malicioso(texto):
             log.warning(f"Comando malicioso bloqueado: {texto[:50]}")
             return
