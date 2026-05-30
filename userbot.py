@@ -122,6 +122,10 @@ BLOQUEIOS = [
     "compressor", "lavadora de pressão", "mangueira",
     "maleta de ferramentas", "kit ferramentas", "bancada",
     "lixadeira", "tupia", "mandril", "broca",
+    # Maliciosos
+    "a-tools", "a_tools", "atools", "t.me/a_toolsx",
+    "want virtual numbers", "want premium proxies",
+    "invite 3 people", "claim your gift",
 ]
 
 CORTAR_A_PARTIR_DE = [
@@ -143,7 +147,6 @@ CORTAR_A_PARTIR_DE = [
     "#anuncio",
 ]
 
-# Comandos maliciosos que devem ser bloqueados
 COMANDOS_BLOQUEADOS = [
     "/promote", "/fullpromote", "/approve",
     "/addadmin", "/ban", "/kick", "/mute",
@@ -317,7 +320,7 @@ async def main():
             "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos · Ferramentas\n"
             "🔄 Anti-duplicata: 5 minutos · 3 palavras\n"
             "✂️ Corte automático de propaganda\n"
-            "🛡️ Proteção contra comandos maliciosos"
+            "🛡️ Proteção contra comandos maliciosos e canais maliciosos"
         ),
         parse_mode=ParseMode.HTML
     )
