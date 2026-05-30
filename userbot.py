@@ -142,6 +142,14 @@ CORTAR_A_PARTIR_DE = [
     "#anúncio",
     "#anuncio",
 ]
+
+# Comandos maliciosos que devem ser bloqueados
+COMANDOS_BLOQUEADOS = [
+    "/promote", "/fullpromote", "/approve",
+    "/addadmin", "/ban", "/kick", "/mute",
+    "/pin", "/unpin", "/del", "/purge",
+    "@maybeatools", "maybeatools",
+]
 # =============================================
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -169,6 +177,11 @@ def cortar_propaganda(texto: str) -> str:
         if idx != -1:
             texto = texto[:idx].strip()
     return texto
+
+
+def eh_comando_malicioso(texto: str) -> bool:
+    t = texto.lower()
+    return any(cmd in t for cmd in COMANDOS_BLOQUEADOS)
 
 
 def limpar_texto(texto: str) -> str:
@@ -246,6 +259,11 @@ async def handler(event):
         if not texto:
             return
 
+        # Bloqueia comandos maliciosos
+        if eh_comando_malicioso(texto):
+            log.warning(f"Comando malicioso bloqueado: {texto[:50]}")
+            return
+
         texto = cortar_propaganda(texto)
 
         if not texto:
@@ -298,7 +316,8 @@ async def main():
             "🧚 Fada dos Cupons: todas as ofertas sem filtro e sem bloqueio\n"
             "🚫 Bloqueios: Moda · Beleza · Pet · Brinquedos · Casa · Bebê · Cozinha · Alimentos · Ferramentas\n"
             "🔄 Anti-duplicata: 5 minutos · 3 palavras\n"
-            "✂️ Corte automático de propaganda"
+            "✂️ Corte automático de propaganda\n"
+            "🛡️ Proteção contra comandos maliciosos"
         ),
         parse_mode=ParseMode.HTML
     )
