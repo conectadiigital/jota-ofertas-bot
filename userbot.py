@@ -1,7 +1,9 @@
 import logging
 import re
+import os
 from datetime import datetime, timedelta
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 from telegram import Bot
 from telegram.constants import ParseMode
 
@@ -13,6 +15,7 @@ API_HASH = "a5e4b989566d3110d9756a27363b7004"
 TELEGRAM_TOKEN = "8625612683:AAEc3prPY2VqtAF6s9u-agrPE7BdM6SuFDA"
 TELEGRAM_CHAT_ID = "-1003923063277"  # Canal JOTA OFERTAS
 TELEGRAM_OWNER_ID = "8889687119"     # Você — avisos do bot vão aqui
+STRING_SESSION = os.environ.get("STRING_SESSION", "")
 
 ANTI_DUPLICATA_MINUTOS = 5
 ANTI_DUPLICATA_PALAVRAS = 3
@@ -145,7 +148,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 log = logging.getLogger(__name__)
 
 bot = Bot(token=TELEGRAM_TOKEN)
-client = TelegramClient("jotaofertas", API_ID, API_HASH)
+client = TelegramClient(StringSession(STRING_SESSION), API_ID, API_HASH)
 
 historico_enviados = {}
 
