@@ -145,6 +145,7 @@ CORTAR_A_PARTIR_DE = [
     "link para entrar no grupo",
     "#anúncio",
     "#anuncio",
+    "grupo de ofertas",
 ]
 
 COMANDOS_BLOQUEADOS = [
