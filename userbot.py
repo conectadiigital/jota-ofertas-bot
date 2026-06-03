@@ -143,8 +143,6 @@ CORTAR_A_PARTIR_DE = [
     "whatsapp.com/channel",
     "link pra entrar no grupo",
     "link para entrar no grupo",
-    "#anúncio",
-    "#anuncio",
     "grupo de ofertas",
 ]
 
@@ -175,11 +173,17 @@ PALAVRAS_IGNORAR = {
 
 
 def cortar_propaganda(texto: str) -> str:
+    # Remove hashtags de anúncio sem cortar o restante da mensagem
+    texto = re.sub(r'#an[uú]ncio', '', texto, flags=re.IGNORECASE).strip()
+
+    # Corta tudo a partir de frases de propaganda
     t_lower = texto.lower()
     for frase in CORTAR_A_PARTIR_DE:
         idx = t_lower.find(frase)
         if idx != -1:
             texto = texto[:idx].strip()
+            t_lower = texto.lower()
+
     return texto
 
 
