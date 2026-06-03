@@ -208,6 +208,16 @@ def similaridade(palavras1: set, palavras2: set) -> int:
     return len(palavras1 & palavras2)
 
 
+def primeira_linha_util(texto: str) -> str:
+    """Retorna a primeira linha com conteúdo real, pulando linhas decorativas curtas."""
+    linhas = [l.strip() for l in texto.split('\n') if l.strip()]
+    for linha in linhas:
+        conteudo = re.sub(r'[^\w\s]', '', linha, flags=re.UNICODE).strip()
+        if len(conteudo) > 15:
+            return linha
+    return linhas[0] if linhas else ""
+
+
 def eh_duplicata(texto: str) -> bool:
     agora = datetime.now()
     limite = agora - timedelta(minutes=ANTI_DUPLICATA_MINUTOS)
@@ -222,9 +232,7 @@ def eh_duplicata(texto: str) -> bool:
             log.info(f"Duplicata detectada por link: {link}")
             return True
 
-    linhas = [l.strip() for l in texto.split('\n') if l.strip()]
-    primeira_linha = linhas[0] if linhas else ""
-    palavras_novas = extrair_palavras_chave(primeira_linha)
+    palavras_novas = extrair_palavras_chave(primeira_linha_util(texto))
 
     for chave in list(historico_enviados.keys()):
         if chave.startswith("titulo:"):
